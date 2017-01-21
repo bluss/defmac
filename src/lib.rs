@@ -4,11 +4,12 @@
 //!
 //! Syntax:
 //!
-//! `defmac!(` *name* [ *pattern* [, *pattern* ... ]] *=>* *expression* `)`
+//! `defmac!(` *name* [ *pattern* [, *pattern* ... ]] `=>` *expression* `)`
 //!
 //! *name* is the name of the new macro, followed by 0 or more patterns
 //! separated by comma. A pattern can be just an argument name like `x`
-//! or a pattern like `ref value`, `(x, y)` etc.
+//! or a pattern like `ref value`, `(x, y)` etc. Note that there is no comma
+//! between the name and the first pattern.
 //!
 //! Supports up to four arguments.
 //!
@@ -37,7 +38,7 @@
 ///
 /// Syntax:
 ///
-/// `defmac!(` *name* [ *pattern* [, *pattern* ... ]] *=>* *expression* `)`
+/// `defmac!(` *name* [ *pattern* [, *pattern* ... ]] `=>` *expression* `)`
 ///
 /// *name* is the name of the new macro, followed by 0 or more patterns
 /// separated by comma. A pattern can be just an argument name like `x`
