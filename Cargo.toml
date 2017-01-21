@@ -1,6 +1,6 @@
 [package]
 name = "defmac"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["bluss"]
 license = "Apache-2.0/MIT"
 
@@ -8,5 +8,6 @@ description = "A macro to define lambda-like macros inline."
 
 documentation = "https://docs.rs/defmac/"
 repository = "https://github.com/bluss/defmac"
+categories = ["rust-patterns"]
 
 [dependencies]
