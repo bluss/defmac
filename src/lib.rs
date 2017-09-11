@@ -33,6 +33,36 @@
 //!
 //! }
 //! ```
+//!
+//! Did you know that macros can “capture” variables that they have in scope?
+//! The capture is by name instead of by reference, which so we can use
+//! defmac where we cannot use closures.
+//!
+//! ```
+//! #[macro_use] extern crate defmac;
+//!
+//! fn main() {
+//!     let mut result = Vec::new();
+//!     let mut sum = 0.;
+//!     let input = "2 2 ^ 7 b ^";
+//!
+//!     defmac!(push elem => result.push(elem));
+//!     defmac!(double => *result.last_mut().unwrap() *= 2);
+//!
+//!     for ch in input.chars() {
+//!         match ch {
+//!             '^' => double!(),
+//!             '0'...'9' => push!(ch as u32 - '0' as u32),
+//!             'a'...'z' => push!(ch as u32 - 'a' as u32),
+//!             _ => { }
+//!         }
+//!     }
+//!
+//!     assert_eq!(
+//!         result,
+//!         vec![2, 4, 7, 2]);
+//! }
+//! ```
 
 /// A macro to define lambda-like macros inline.
 ///
