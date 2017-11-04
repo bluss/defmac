@@ -36,7 +36,7 @@
 //!
 //! Did you know that macros can “capture” variables that they have in scope?
 //! The capture is by name instead of by reference, so we can use
-//! defmac where we cannot use closures.
+//! defmac where we cannot use closures. See the example below:
 //!
 //! ```
 //! #[macro_use] extern crate defmac;
