@@ -1,4 +1,4 @@
-#![no_std]
+#![cfg_attr(not(test), no_std)]
 
 //! A macro to define lambda-like macros inline.
 //!
@@ -10,8 +10,6 @@
 //! separated by comma. A pattern can be just an argument name like `x`
 //! or a pattern like `ref value`, `(x, y)` etc. Note that there is no comma
 //! between the name and the first pattern.
-//!
-//! Supports up to four arguments.
 //!
 //! # Example
 //!
@@ -74,50 +72,50 @@
 /// separated by comma. A pattern can be just an argument name like `x`
 /// or a pattern like `ref value`, `(x, y)` etc.
 ///
-/// Supports up to four arguments.
+/// Supports arbitrary many arguments.
 #[macro_export]
 macro_rules! defmac {
-    ($name:ident => $e:expr) => {
+    // nest matches final rule
+    (@nest $name:ident ($dol:tt) => (
+        [$($arg:ident)*] $($result_body:tt)+)
+    ) => {
         macro_rules! $name {
-            () => { $e }
-        }
-    };
-    ($name:ident $x:pat => $e:expr) => {
-        macro_rules! $name {
-            ($arg:expr) => {
-                match $arg { $x => $e }
+            ($($dol $arg : expr), *) => {
+                $($result_body)+
             }
         }
     };
-    ($name:ident $x1:pat, $x2:pat => $e:expr) => {
-        macro_rules! $name {
-            ($a1:expr, $a2:expr) => {
-                match $a1 { $x1 =>
-                match $a2 { $x2 => $e } }
-            }
-        }
+
+    // nest matches entry point and recursive rule
+    (@nest $name:ident ($dol:tt) => (
+            [$($arg:ident)*] $($result_body:tt)+
+        )
+        $p1:pat $(, $p2:pat)*
+    ) => {
+        // `marg` is a hygienic macro argument name
+        defmac!(@nest $name ($dol) => (
+            [marg $($arg)*]
+            match {$dol marg} { $p1 => $($result_body)+ }
+        )
+        $($p2),* )
     };
-    ($name:ident $x1:pat, $x2:pat, $x3:pat => $e:expr) => {
-        macro_rules! $name {
-            ($a1:expr, $a2:expr, $a3:expr) => {
-                match $a1 { $x1 =>
-                match $a2 { $x2 =>
-                match $a3 { $x3 => $e } } }
-            }
-        }
+
+    // reverse patterns before passing them on to @nest
+    // reverse patterns final rule
+    (@revpats [$($args:tt)*] [$($pr:pat),*]) => {
+        defmac!(@nest $($args)* $($pr),*)
     };
-    ($name:ident $x1:pat, $x2:pat, $x3:pat, $x4:pat => $e:expr) => {
-        macro_rules! $name {
-            ($a1:expr, $a2:expr, $a3:expr, $a4:expr) => {
-                match $a1 { $x1 =>
-                match $a2 { $x2 =>
-                match $a3 { $x3 =>
-                match $a4 { $x4 => $e } } } }
-            }
-        }
+
+    // reverse patterns entry point and recursive rule
+    (@revpats [$($args:tt)*] [$($pr:pat),*] $p1:pat $(, $p2:pat)*) => {
+        defmac!(@revpats [$($args)*] [$p1 $(, $pr)*] $($p2),*)
+    };
+
+    // entry point
+    ($name:ident $($p1:pat),* => $result:expr) => {
+        defmac!(@revpats [$name ($) => ([] $result)] [] $($p1),*)
     };
 }
-
 
 
 
@@ -142,5 +140,27 @@ mod tests {
 
         defmac!(four w, x, y, z => (w + x, z, y));
         assert_eq!(four!(3, 4, "a", "b"), (7, "b", "a"));
+
+        defmac!(many a, b, c, d, e, f, g, h, i, j, k => (a, b + c, d + e + f,
+                                                         g + h + i + j + k));
+        assert_eq!(many!(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
+                   (1, 5, 15, 45));
+    }
+
+    #[test]
+    fn eval_order() {
+        use std::cell::Cell;
+        let v = Cell::new(0);
+        let f = || {
+            let n = v.get();
+            v.set(n + 1);
+            n
+        };
+
+        defmac!(two x, y => (x, y));
+
+        let result = two!(f(), f());
+        assert_eq!(result, (0, 1));
+        assert_eq!(f(), 2);
     }
 }
