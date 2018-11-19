@@ -61,6 +61,10 @@
 //!         vec![2, 4, 7, 2]);
 //! }
 //! ```
+//!
+//! ## Rust Version
+//!
+//! This crate requires Rust 1.20 or later.
 
 /// A macro to define lambda-like macros inline.
 ///

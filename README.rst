@@ -17,6 +17,12 @@ __ https://docs.rs/defmac
 Recent Changes
 --------------
 
+- 0.2.0
+
+  - New implementation that is general and variadic: defmac now supports
+    making macros with arbitrarily many parameters!
+  - Requires Rust 1.20
+
 - 0.1.3
 
   - Update docs with another example and a tip about syntactical variable
