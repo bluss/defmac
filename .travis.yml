@@ -4,12 +4,16 @@ matrix:
   include:
     - rust: 1.20.0
     - rust: stable
+      env: STABLE=1
     - rust: nightly
+      env: STABLE=1
 branches:
   only:
     - master
 script:
   - |
-      cargo build --verbose &&
-      cargo test --verbose &&
-      cargo doc -v
+      cargo build -v &&
+      cargo test -v --lib &&
+      cargo test -v --doc &&
+      cargo doc -v &&
+      ([ "$STABLE" != 1 ] || cargo test )
