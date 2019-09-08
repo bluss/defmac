@@ -77,7 +77,7 @@
 /// or a pattern like `ref value`, `(x, y)` etc.
 ///
 /// Supports arbitrary many arguments.
-#[macro_export]
+#[macro_export(local_inner_macros)]
 macro_rules! defmac {
     // nest matches final rule
     (@nest $name:ident ($dol:tt) => (
@@ -97,30 +97,29 @@ macro_rules! defmac {
         $p1:pat $(, $p2:pat)*
     ) => {
         // `marg` is a hygienic macro argument name
-        defmac!(@nest $name ($dol) => (
+        defmac!{@nest $name ($dol) => (
             [marg $($arg)*]
             match {$dol marg} { $p1 => $($result_body)+ }
         )
-        $($p2),* )
+        $($p2),* }
     };
 
     // reverse patterns before passing them on to @nest
     // reverse patterns final rule
     (@revpats [$($args:tt)*] [$($pr:pat),*]) => {
-        defmac!(@nest $($args)* $($pr),*)
+        defmac!{@nest $($args)* $($pr),*}
     };
 
     // reverse patterns entry point and recursive rule
     (@revpats [$($args:tt)*] [$($pr:pat),*] $p1:pat $(, $p2:pat)*) => {
-        defmac!(@revpats [$($args)*] [$p1 $(, $pr)*] $($p2),*)
+        defmac!{@revpats [$($args)*] [$p1 $(, $pr)*] $($p2),*}
     };
 
     // entry point
     ($name:ident $($p1:pat),* => $result:expr) => {
-        defmac!(@revpats [$name ($) => ([] $result)] [] $($p1),*)
+        defmac!{@revpats [$name ($) => ([] $result)] [] $($p1),*}
     };
 }
-
 
 
 #[cfg(test)]
@@ -166,5 +165,13 @@ mod tests {
         let result = two!(f(), f());
         assert_eq!(result, (0, 1));
         assert_eq!(f(), 2);
+    }
+
+    // Test expansion at module level
+    defmac! { triple value => [value; 3] }
+
+    #[test]
+    fn module_macro() {
+        assert_eq!(triple!(3), [3, 3, 3]);
     }
 }
