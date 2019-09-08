@@ -1,6 +1,6 @@
 [package]
 name = "defmac"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["bluss"]
 license = "Apache-2.0/MIT"
 
@@ -14,3 +14,4 @@ categories = ["rust-patterns"]
 
 [package.metadata.release]
 no-dev-version = true
+tag-name = "{{version}}"

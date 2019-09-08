@@ -17,6 +17,12 @@ __ https://docs.rs/defmac
 Recent Changes
 --------------
 
+- 0.2.1
+
+  - Fix so that the macro can be used through its full path (like
+    `defmac::defmac! { .. }`
+  - Fix so that the macro can expand at module level
+
 - 0.2.0
 
   - New implementation that is general and variadic: defmac now supports
