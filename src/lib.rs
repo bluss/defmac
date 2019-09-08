@@ -77,7 +77,7 @@
 /// or a pattern like `ref value`, `(x, y)` etc.
 ///
 /// Supports arbitrary many arguments.
-#[macro_export]
+#[macro_export(local_inner_macros)]
 macro_rules! defmac {
     // nest matches final rule
     (@nest $name:ident ($dol:tt) => (
